@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink-950: #14161c;
+  --color-ink-900: #1c1f27;
+  --color-ink-800: #262a35;
+  --color-ink-700: #2e3340;
+  --color-ink-600: #3a4050;
+  --color-paper: #e8e2d0;
+  --color-paper-light: #f5f2e9;
+  --color-muted: #9a9688;
+  --color-gold: #d4a64a;
+  --color-gold-hover: #e5b95c;
+  --color-stalk: #c9b07a;
+  --color-stalk-dark: #8a7444;
+  --color-stalk-hl: #f0d58c;
+  --color-jade: #5fb39a;
+  --color-cinnabar: #e0524a;
+  --color-verdant: #4cc26b;
+
+  --font-serif: "Noto Serif TC", "Songti TC", "Source Han Serif TC", serif;
+  --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-ink-950);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 自訂捲軸樣式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #14161c;
+}
+::-webkit-scrollbar-thumb {
+  background: #3a4050;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4a64a;
+}
