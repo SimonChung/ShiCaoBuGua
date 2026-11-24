@@ -7,10 +7,16 @@
   if (!pending) return;
 
   const selector = chatGPT
-    ? '#prompt-textarea[contenteditable="true"], textarea#prompt-textarea'
+    // 首頁的 pending-home-input 會在載入後被取代。只在正式編輯器出現後領取草稿。
+    ? [
+      '.ProseMirror[contenteditable="true"][role="textbox"]',
+      'textarea#mobile-composer-prompt',
+      '#prompt-textarea[contenteditable="true"]',
+      'textarea#prompt-textarea',
+    ].join(', ')
     : 'rich-textarea [contenteditable="true"], .ql-editor[contenteditable="true"][role="textbox"], textarea[aria-label="Enter a prompt here"]';
   const findEditor = () => [...document.querySelectorAll(selector)].find(el =>
-    el.getClientRects().length && !el.disabled && !el.readOnly && el.getAttribute('aria-disabled') !== 'true'
+    el.getClientRects().length && !el.matches(':disabled, [readonly], [aria-disabled="true"]')
   );
   const readText = el => el instanceof HTMLTextAreaElement ? el.value : el.innerText;
   const normalized = text => text.replace(/[\s\u200B]+/gu, ' ').trim();
@@ -56,6 +62,6 @@
     observer.disconnect();
     if (isNewChat()) notify('尚未找到輸入框。可回卜卦分頁重新開啟或手動複製提示詞。');
   }, Math.max(0, pending.expires - Date.now()));
-  observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['contenteditable', 'class', 'disabled', 'aria-disabled', 'style'] });
+  observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['id', 'role', 'contenteditable', 'class', 'disabled', 'readonly', 'aria-disabled', 'hidden', 'style'] });
   await fillWhenReady();
 })().catch(() => { /* 擴充功能可能已被停用，原卜卦分頁仍可手動複製。 */ });
