@@ -36,6 +36,18 @@
 
 ## 🚀 本機啟動與執行
 
+### 使用 Docker Compose
+
+啟動 Docker 後，在專案根目錄執行：
+
+```bash
+docker compose up -d --build --wait
+```
+
+開啟 [蓍草卜卦](http://127.0.0.1:5173/)。容器會以 Vite 預覽模式提供建置後的網頁與卜卦紀錄 API，預設僅供本機連線。若 5173 已被占用，可設定環境變數 `SHICAO_PORT` 後重新啟動，並使用對應連接埠開啟網頁。
+
+卜卦紀錄的 JSON 與 Markdown 存在名為 `records` 的 Compose volume，掛載於容器的 `/app/records`。執行 `docker compose down` 可停止服務並保留紀錄，再次啟動即可調閱。
+
 ### 1. 環境需求
 - **Node.js** ≥ 18（建議 Node 20+）
 - **npm** ≥ 9
