@@ -6,6 +6,7 @@ export const INITIAL_STATE = {
   phase: 'idle', // 'idle' | 'setup' | 'awaitSplit' | 'splitting' | 'hanging' | 'countLeft' | 'countRight' | 'gathering' | 'merging' | 'lineFormed' | 'finished'
   runId: 0,
   question: '',
+  readingQuestion: '', // 起卦時的問題；成卦後輸入框可準備下一卦
   startedAt: null,
   finishedAt: null,
   lineIndex: 0,    // 0~5 (初爻~上爻)
@@ -34,10 +35,12 @@ export function divinationReducer(state, action) {
   switch (action.type) {
     case 'RESET_AND_START': {
       const now = action.payload?.now || new Date().toISOString();
+      const question = action.payload?.question ?? state.question;
       return {
         ...INITIAL_STATE,
         runId: state.runId + 1,
-        question: action.payload?.question !== undefined ? action.payload.question : state.question,
+        question,
+        readingQuestion: question,
         startedAt: now,
         speed: state.speed,
         phase: 'setup',
@@ -302,6 +305,7 @@ export function divinationReducer(state, action) {
         ...state,
         phase: 'finished',
         startedAt: state.startedAt || new Date().toISOString(),
+        readingQuestion: state.startedAt ? state.readingQuestion : state.question,
         finishedAt: new Date().toISOString(),
         lineIndex: 5,
         changeIndex: 2,

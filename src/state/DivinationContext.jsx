@@ -25,7 +25,7 @@ export function DivinationProvider({ children }) {
   useEffect(() => {
     if (state.phase === 'finished' && state.lines.length === 6 && !state.recordSaved) {
       const record = {
-        question: state.question,
+        question: state.readingQuestion,
         startedAt: state.startedAt,
         finishedAt: state.finishedAt,
         lines: state.lines,
@@ -41,7 +41,7 @@ export function DivinationProvider({ children }) {
         }
       });
     }
-  }, [state.phase, state.lines, state.primaryHex, state.changedHex, state.movingLines, state.recordSaved, state.question, state.startedAt, state.finishedAt, state.changes]);
+  }, [state.phase, state.lines, state.primaryHex, state.changedHex, state.movingLines, state.recordSaved, state.readingQuestion, state.startedAt, state.finishedAt, state.changes]);
 
   const startOrRestart = useCallback((question) => {
     dispatch({ type: 'RESET_AND_START', payload: { question } });

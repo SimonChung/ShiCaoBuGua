@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { listRecords, getRecord, deleteRecord, toMarkdown, downloadFile } from '../services/records.js';
 import { formatDateTime } from '../utils/format.js';
 import { HexagramFigure } from './HexagramFigure.jsx';
+import { ReadingAiButtons } from './ReadingAiButtons.jsx';
 import { X, Search, Trash2, Download, Calendar, ArrowRight, BookOpen, HardDrive, Database } from 'lucide-react';
 
 export function HistoryDrawer({ isOpen, onClose }) {
@@ -185,6 +186,8 @@ export function HistoryDrawer({ isOpen, onClose }) {
                     </p>
                   </div>
 
+                  <ReadingAiButtons key={selectedRecord.id} record={selectedRecord} />
+
                   {/* 雙卦展示 */}
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     <div className="flex flex-col items-center">
@@ -224,7 +227,8 @@ export function HistoryDrawer({ isOpen, onClose }) {
                     <div className="border-t border-ink-700 pt-3 space-y-1.5">
                       <span className="text-xs font-bold text-gold">變爻爻辭：</span>
                       {selectedRecord.movingLines.map(pos => {
-                        const lData = selectedRecord.primary.lines[pos - 1];
+                        const lData = selectedRecord.primary.lines?.[pos - 1];
+                        if (!lData) return null;
                         return (
                           <div key={pos} className="text-xs bg-ink-900/60 p-2 rounded border border-ink-700/60">
                             <span className="font-serif font-bold text-gold mr-2">{lData.label}：</span>
