@@ -1,9 +1,10 @@
-import React, { useState, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { useDivination } from '../state/DivinationContext.jsx';
 import { YarrowStick } from './YarrowStick.jsx';
-import { clampSplit, getLineName } from '../core/yarrow.js';
-import { Sparkles, MousePointerClick, CheckCircle2 } from 'lucide-react';
+import { YarrowTable } from './YarrowTable.jsx';
+import { TOTAL_STICKS, getLineName } from '../core/yarrow.js';
+import { CheckCircle2 } from 'lucide-react';
 
 export function YarrowBoard() {
   const { state, split } = useDivination();
@@ -18,40 +19,22 @@ export function YarrowBoard() {
     changeIndex,
   } = state;
 
-  const boardRef = useRef(null);
-  const [hoverIndex, setHoverIndex] = useState(null);
-
-  // 當前可用蓍草枝數
-  const currentTotal = sticks || 49;
-
-  // 計算滑鼠在蓍草排上的切分點
-  const handleMouseMove = (e) => {
-    if (phase !== 'awaitSplit' || !boardRef.current) return;
-    const rect = boardRef.current.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const ratio = Math.max(0, Math.min(1, mouseX / rect.width));
-    const rawK = Math.round(ratio * currentTotal);
-    const clamped = clampSplit(rawK, currentTotal);
-    setHoverIndex(clamped);
-  };
-
-  const handleMouseLeave = () => {
-    setHoverIndex(null);
-  };
-
-  const handleClick = (e) => {
-    if (phase !== 'awaitSplit') return;
-    const targetK = hoverIndex !== null ? hoverIndex : Math.floor(currentTotal / 2);
-    split(targetK);
-  };
-
   // 歸奇總數計算
   const totalGatheredForLine = useMemo(() => {
     return (gatheredForLine || []).reduce((acc, v) => acc + v, 0);
   }, [gatheredForLine]);
 
-  // 靜止狀態蓍草陣列
-  const staticSticks = Array.from({ length: 50 }, (_, i) => i);
+  const tablePhase = ['idle', 'setup', 'awaitSplit', 'splitting', 'hanging', 'merging'].includes(phase);
+  const tableCaptions = {
+    idle: '天地之數五十有五，大衍之數五十，其用四十有九。',
+    setup: '虛一置旁，四十九枝起筮。',
+    awaitSplit: '按住草束，向右撥開後放手',
+    merging: `剩餘 ${currentChange?.after} 枝，重新合束。`,
+  };
+  let tableTotal = sticks;
+  if (phase === 'idle') tableTotal = TOTAL_STICKS;
+  if (phase === 'hanging') tableTotal = sticks - 1;
+  if (phase === 'merging') tableTotal = currentChange.after;
 
   return (
     <div className="bg-ink-900 border border-ink-600/60 rounded-xl p-4 sm:p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[460px]">
@@ -130,152 +113,15 @@ export function YarrowBoard() {
 
       {/* 中央主舞台：蓍草排列與分揲動態 */}
       <div className="flex-1 flex flex-col justify-center items-center py-4 relative">
-        {/* 階段 1：idle 未開始 */}
-        {phase === 'idle' && (
-          <div className="flex flex-col items-center text-center space-y-4">
-            <div className="flex items-center justify-center gap-1 overflow-x-auto max-w-full px-2 py-3">
-              {staticSticks.map((i) => (
-                <YarrowStick key={i} id={`idle-${i}`} height={100} width={5} />
-              ))}
-            </div>
-            <p className="text-sm text-muted font-serif">
-              天地之數五十有五，大衍之數五十，其用四十有九。
-            </p>
-          </div>
-        )}
-
-        {/* 階段 2：setup 準備排布 */}
-        {phase === 'setup' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center space-y-3"
-          >
-            <div className="flex items-center justify-center gap-1 px-2">
-              {Array.from({ length: 49 }, (_, i) => (
-                <YarrowStick key={i} id={`setup-${i}`} height={100} width={5} />
-              ))}
-            </div>
-            <p className="text-xs text-gold animate-pulse">
-              四十九枝蓍草整列就緒，即將由您「分二」起筮...
-            </p>
-          </motion.div>
-        )}
-
-        {/* 階段 3：awaitSplit 等待使用者點選切分點 */}
-        {phase === 'awaitSplit' && (
-          <div className="w-full flex flex-col items-center select-none">
-            <div className="text-xs text-gold/90 bg-gold/10 px-3 py-1 rounded-full border border-gold/30 mb-3 flex items-center gap-1.5 animate-bounce">
-              <MousePointerClick className="w-3.5 h-3.5 text-gold" />
-              <span>請在下方蓍草排間移動並點擊，切分為左、右兩堆</span>
-            </div>
-
-            {/* 互動蓍草排容器 */}
-            <div
-              ref={boardRef}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              onClick={handleClick}
-              className="relative py-6 px-4 bg-ink-950/40 rounded-xl border border-ink-700/60 hover:border-gold/50 cursor-crosshair transition-all flex items-center justify-center gap-1 max-w-full overflow-x-auto"
-            >
-              {Array.from({ length: currentTotal }, (_, i) => {
-                const isLeft = hoverIndex !== null && i < hoverIndex;
-                const isSplitPoint = hoverIndex !== null && i === hoverIndex - 1;
-
-                return (
-                  <React.Fragment key={i}>
-                    <YarrowStick
-                      id={`split-${i}`}
-                      height={100}
-                      width={5}
-                      isHighlighted={isLeft}
-                    />
-                    {/* 分二導引虛線與浮動標籤 */}
-                    {isSplitPoint && (
-                      <div className="relative flex items-center justify-center mx-1">
-                        <div className="w-0.5 h-28 bg-gold shadow-[0_0_8px_rgba(212,166,74,0.9)]" />
-                        <div className="absolute -top-7 whitespace-nowrap bg-gold text-ink-950 font-bold font-mono text-[11px] px-2 py-0.5 rounded shadow-lg pointer-events-none z-20">
-                          左 {hoverIndex} 枝 ｜ 右 {currentTotal - hoverIndex} 枝
-                        </div>
-                      </div>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </div>
-
-            {/* 輔助資訊 */}
-            <div className="mt-3 flex items-center gap-4 text-xs font-mono text-muted">
-              <span>當前蓍草：{currentTotal} 枝</span>
-              {hoverIndex !== null && (
-                <span className="text-gold font-bold">
-                  左堆：{hoverIndex} 枝，右堆：{currentTotal - hoverIndex} 枝
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* 階段 4：splitting 分二完成 */}
-        {phase === 'splitting' && splitData && (
-          <div className="flex flex-col items-center w-full">
-            <div className="flex items-center justify-center gap-8 sm:gap-14 py-4 w-full">
-              {/* 左堆 */}
-              <div className="flex flex-col items-center bg-ink-950/60 p-3 rounded-xl border border-ink-700">
-                <span className="text-xs text-gold font-serif mb-2 font-bold">
-                  左堆（象天）: {splitData.left} 枝
-                </span>
-                <div className="flex gap-1">
-                  {Array.from({ length: splitData.left }, (_, i) => (
-                    <YarrowStick key={i} height={90} width={4.5} />
-                  ))}
-                </div>
-              </div>
-
-              {/* 右堆 */}
-              <div className="flex flex-col items-center bg-ink-950/60 p-3 rounded-xl border border-ink-700">
-                <span className="text-xs text-paper font-serif mb-2 font-bold">
-                  右堆（象地）: {splitData.right} 枝
-                </span>
-                <div className="flex gap-1">
-                  {Array.from({ length: splitData.right }, (_, i) => (
-                    <YarrowStick key={i} height={90} width={4.5} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 階段 5：hanging 掛一完成 */}
-        {phase === 'hanging' && currentChange && (
-          <div className="flex flex-col items-center w-full">
-            <div className="flex items-center justify-center gap-8 sm:gap-14 py-4 w-full">
-              {/* 左堆 */}
-              <div className="flex flex-col items-center bg-ink-950/60 p-3 rounded-xl border border-ink-700">
-                <span className="text-xs text-gold font-serif mb-2 font-bold">
-                  左堆: {currentChange.left} 枝
-                </span>
-                <div className="flex gap-1">
-                  {Array.from({ length: currentChange.left }, (_, i) => (
-                    <YarrowStick key={i} height={90} width={4.5} />
-                  ))}
-                </div>
-              </div>
-
-              {/* 右堆（已扣除掛一之一枝） */}
-              <div className="flex flex-col items-center bg-ink-950/60 p-3 rounded-xl border border-ink-700">
-                <span className="text-xs text-paper font-serif mb-2 font-bold">
-                  右堆（抽出一枝後）: {currentChange.rightAfterHang} 枝
-                </span>
-                <div className="flex gap-1">
-                  {Array.from({ length: currentChange.rightAfterHang }, (_, i) => (
-                    <YarrowStick key={i} height={90} width={4.5} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+        {tablePhase && (
+          <YarrowTable
+            key={`${state.runId}-${lineIndex}-${changeIndex}`}
+            total={tableTotal}
+            caption={tableCaptions[phase]}
+            left={phase === 'splitting' || phase === 'hanging' ? splitData.left : null}
+            afterHang={phase === 'hanging'}
+            onSplit={phase === 'awaitSplit' ? split : undefined}
+          />
         )}
 
         {/* 階段 6 & 7：countLeft / countRight 揲四 */}
@@ -392,18 +238,6 @@ export function YarrowBoard() {
           </motion.div>
         )}
 
-        {/* 階段 9：merging 合併蓍草 */}
-        {phase === 'merging' && currentChange && (
-          <div className="flex flex-col items-center space-y-3">
-            <span className="text-xs font-serif text-gold">剩餘蓍草重新合聚成排（共 {currentChange.after} 枝）</span>
-            <div className="flex items-center justify-center gap-1 px-2">
-              {Array.from({ length: currentChange.after }, (_, i) => (
-                <YarrowStick key={i} height={85} width={4.5} />
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* 階段 10：lineFormed 三變皆畢成爻 */}
         {phase === 'lineFormed' && (
           <motion.div
@@ -454,7 +288,7 @@ export function YarrowBoard() {
         <span className="font-serif">大衍筮法：分二 ➔ 掛一 ➔ 揲四 ➔ 歸奇</span>
         <span className="font-mono">
           {phase === 'awaitSplit'
-            ? '請點擊蓍草排分堆'
+            ? '待分二'
             : phase === 'finished'
             ? '卜卦已完成'
             : '推演計算中...'}
