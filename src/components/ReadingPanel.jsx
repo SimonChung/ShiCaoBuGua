@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDivination } from '../state/DivinationContext.jsx';
 import { readingGuide } from '../core/hexagram.js';
 import { toMarkdown, downloadFile } from '../services/records.js';
+import { ReadingAiButtons } from './ReadingAiButtons.jsx';
 import { Download, Copy, Check, BookOpen, AlertCircle, Sparkles } from 'lucide-react';
 
 export function ReadingPanel() {
@@ -12,7 +13,7 @@ export function ReadingPanel() {
     primaryHex,
     changedHex,
     movingLines,
-    question,
+    readingQuestion: question,
     startedAt,
     finishedAt,
     changes,
@@ -115,6 +116,8 @@ export function ReadingPanel() {
           </button>
         </div>
       </div>
+
+      <ReadingAiButtons record={fullRecord} />
 
       {/* 朱熹《易學啟蒙》解卦指引 */}
       {guide && (

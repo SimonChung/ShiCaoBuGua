@@ -16,12 +16,12 @@ export function StepNarration() {
       case 'setup':
         return {
           classic: '其用四十有九，虛一不用以象太極。',
-          vernacular: '整排五十枝蓍草排列就緒，取出一枝置於一旁，象徵天地未分之太極，其餘四十九枝用以起筮。',
+          vernacular: '從一束五十枝蓍草中取出一枝置於旁，象徵天地未分之太極，其餘四十九枝用以起筮。',
         };
       case 'awaitSplit':
         return {
           classic: '分而為二以象兩儀。',
-          vernacular: '請在蓍草排中任選一處縫隙點擊，依心意切分為「左堆」與「右堆」，以象徵天地兩儀。',
+          vernacular: '在草束中選一處按住，用手指或滑鼠把右側蓍草撥開。放手後揭示左右枝數，以象天地兩儀。',
         };
       case 'splitting':
         return {
