@@ -1,18 +1,15 @@
 import React from 'react';
 import { useDivination } from '../state/DivinationContext.jsx';
-import { Sparkles, Info } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 export function StepNarration() {
   const { state } = useDivination();
   const { phase, split, currentChange, gatheredForLine } = state;
 
+  if (phase === 'idle') return null;
+
   const getNarration = () => {
     switch (phase) {
-      case 'idle':
-        return {
-          classic: '大衍之數五十，其用四十有九。',
-          vernacular: '周易以五十根蓍草起筮，虛其一以象太極，其用四十有九。請點擊「開始卜卦」。',
-        };
       case 'setup':
         return {
           classic: '其用四十有九，虛一不用以象太極。',
