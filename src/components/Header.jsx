@@ -5,21 +5,6 @@ export function Header({ onOpenHistory }) {
   return (
     <>
       <header className="bg-ink-900 px-4 sm:px-6 py-4 sm:py-5">
-        <div className="max-w-7xl mx-auto flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-gold/10 text-gold shrink-0" aria-hidden="true">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <div className="space-y-1">
-            <h1 className="font-serif font-bold text-gold text-xl sm:text-3xl tracking-wide text-balance">
-              大衍之數五十，其用四十有九。
-            </h1>
-            <p className="text-sm sm:text-base text-paper/90 leading-relaxed">
-              周易以五十根蓍草起筮，虛其一以象太極，其用四十有九。
-            </p>
-          </div>
-        </div>
-      </header>
-      <div className="border-y border-ink-600/70 bg-ink-900/90 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <span className="text-2xl sm:text-3xl text-gold select-none animate-pulse">☯</span>
@@ -30,8 +15,11 @@ export function Header({ onOpenHistory }) {
                   周易大衍筮法
                 </span>
               </div>
-              <p className="text-xs text-muted hidden sm:block">
-                「分而為二以象兩，掛一以象三，揲之以四以象四時，歸奇於扐以象閏。」
+              <h2 className="font-serif font-bold text-gold text-xl sm:text-3xl tracking-wide text-balance">
+                大衍之數五十，其用四十有九。
+              </h2>
+              <p className="text-sm sm:text-base text-paper/90 leading-relaxed">
+                分而為二以象兩，掛一以象三，揲之以四以象四時，歸奇於扐以象閏，五歲再閏，故再扐而後掛。天數五，地數五，五位相得而各有合。天數二十有五，地數三十，凡天地之數，五十有五，此所以成變化，而行鬼神也。乾之策二百一十有六，坤之策百四十有四，凡三百有六十，當期之日。二篇之策，萬有一千五百二十，當萬物之數也，是故，四營而成易，十有八變而成卦，八卦而小成，引而伸之，觸類而長之，天下之能事畢矣。顯道，神德行，是故可與酬酢，可與祐神矣。
               </p>
             </div>
           </div>
@@ -46,7 +34,7 @@ export function Header({ onOpenHistory }) {
             <span>歷史紀錄</span>
           </button>
         </div>
-      </div>
+      </header>
     </>
   );
 }
